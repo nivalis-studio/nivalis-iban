@@ -2,6 +2,7 @@ import { nivalis } from '@nivalis/eslint-config';
 
 export default nivalis(
   {
+    tailwindcss: false,
     typescript: {
       configPath: './tsconfig.json',
     },

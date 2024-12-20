@@ -61,7 +61,8 @@ const parseStructure = (structure: string): RegExp => {
       }
     }
 
-    return `([${format}]{${repeats}})`;
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion, @typescript-eslint/no-non-null-assertion
+    return `([${format!}]{${repeats}})`;
   });
 
   if (!regex) {
