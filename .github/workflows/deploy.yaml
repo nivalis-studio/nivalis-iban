@@ -1,11 +1,5 @@
 name: Deploy
-on:
-  pull_request:
-  push:
-    branches:
-      - '**'
-    tags:
-      - '!**'
+on: [push, pull_request]
 
 jobs:
   build:
@@ -15,7 +9,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - run: corepack enable
+      - run: Setup bun
       - uses: oven-sh/setup-bun@v2
 
       - name: Install dependencies
@@ -24,4 +18,4 @@ jobs:
       - name: Build
         run: bun run build
 
-      - run: bunx pkg-pr-new publish --comment=update
+      - run: bunx pkg-pr-new publish
