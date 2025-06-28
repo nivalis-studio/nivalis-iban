@@ -1,12 +1,11 @@
 {
   "name": "@nivalis/iban",
-  "type": "module",
   "version": "0.0.1",
   "description": "A simple library to validate IBAN numbers",
-  "publishConfig": {
-    "access": "public"
-  },
-  "license": "MIT",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "type": "module",
   "homepage": "https://github.com/nivalis-studio/iban#readme",
   "repository": {
     "url": "git+https://github.com/nivalis-studio/iban.git"
@@ -27,49 +26,45 @@
       }
     }
   },
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
+  "publishConfig": {
+    "access": "public"
+  },
+  "license": "MIT",
+  "sideEffects": false,
+  "packageManager": "bun@1.2.17",
+  "scripts": {
+    "test": "bun test",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "ts": "tsc",
+    "build": "tsdown",
+    "prepack": "tsdown",
+    "prepare": "bunx lefthook install"
+  },
   "files": [
     "LICENSE",
     "README.md",
     "dist"
   ],
-  "scripts": {
-    "test": "exit 0",
-    "build": "unbuild",
-    "prepublishOnly": "unbuild",
-    "ts": "tsc",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
-    "prepare": "simple-git-hooks"
+  "devDependencies": {
+    "@commitlint/cli": "19.8.1",
+    "@commitlint/config-conventional": "19.8.1",
+    "@nivalis/eslint-config": "5.4.2",
+    "@nivalis/prettier-config": "3.6.2",
+    "@types/bun": "latest",
+    "eslint": "9.29.0",
+    "lefthook": "1.11.14",
+    "lint-staged": "16.1.2",
+    "prettier": "3.6.2",
+    "tsdown": "0.12.9"
   },
   "peerDependencies": {
-    "typescript": "^5.0.0"
-  },
-  "devDependencies": {
-    "@nivalis/eslint-config": "4.2.1",
-    "@nivalis/prettier-config": "3.4.2",
-    "@types/bun": "latest",
-    "eslint": "9.17.0",
-    "lint-staged": "15.2.11",
-    "prettier": "3.4.2",
-    "simple-git-hooks": "2.11.1",
-    "unbuild": "3.0.1"
-  },
-  "prettier": "@nivalis/prettier-config",
-  "simple-git-hooks": {
-    "pre-commit": "npx lint-staged"
+    "typescript": "^5"
   },
   "lint-staged": {
-    "*": [
-      "eslint --fix --quiet"
-    ]
+    "*": "eslint --quiet --fix"
   },
-  "unbuild": {
-    "declaration": true,
-    "exports": "named",
-    "preserveModules": true,
-    "sourcemap": true
+  "simple-git-hooks": {
+    "pre-commit": "npx lint-staged"
   }
 }

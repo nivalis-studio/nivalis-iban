@@ -7,7 +7,7 @@ import {
   isValidBBAN,
   printFormat,
   toBBAN,
-} from '../src/index';
+} from './index';
 
 describe('IBAN', () => {
   describe('.isValid', () => {
@@ -54,7 +54,8 @@ describe('IBAN', () => {
       const countryList = availableCountries();
 
       for (const countryCode of Object.keys(countryList)) {
-        expect(isValid(countryList[countryCode].example)).toBe(true);
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        expect(isValid(countryList[countryCode]!.example)).toBe(true);
       }
     });
 
@@ -62,7 +63,8 @@ describe('IBAN', () => {
       const countryList = availableCountries();
 
       for (const countryCode of Object.keys(countryList)) {
-        let num = countryList[countryCode].example;
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        let num = countryList[countryCode]!.example;
 
         num = `${num.slice(0, -1)}${(Number.parseInt(num.slice(-1), 10) + 1) % 10}`;
         expect(isValid(num)).toBe(false);

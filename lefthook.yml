@@ -1,0 +1,8 @@
+commit-msg:
+  commands:
+    commitlint:
+      run: bun commitlint --edit
+pre-commit:
+  commands:
+    lint:
+      run: bun lint-staged
