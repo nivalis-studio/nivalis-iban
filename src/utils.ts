@@ -8,4 +8,4 @@ export const A_CODE_POINT_AT = 65; // 'A'.codePointAt(0);
  * @returns {boolean} true if the passed variable is a String, false otherwise.
  */
 export const isString = (value: unknown): value is string =>
-  typeof value == 'string' || value instanceof String;
+  typeof value == 'string' || typeof value === 'string';

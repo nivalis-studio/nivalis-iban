@@ -13,7 +13,9 @@ const parseStructure = (structure: string): RegExp => {
   const regex = structure.match(/.{3}/g)?.map(block => {
     // parse each structure block (1-char + 2-digits)
     let format;
-    const pattern = block[0];
+
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const pattern = block[0]!;
     const repeats = Number.parseInt(block.slice(1), 10);
 
     // eslint-disable-next-line default-case
@@ -190,9 +192,7 @@ export class Specification {
    * @returns {RegExp} Regexp
    */
   private regex(): RegExp {
-    if (!this.cachedRegex) {
-      this.cachedRegex = parseStructure(this.structure);
-    }
+    this.cachedRegex ??= parseStructure(this.structure);
 
     return this.cachedRegex;
   }
