@@ -1,5 +1,5 @@
 import { COUNTRIES } from './countries';
-import { EVERY_FOUR_CHARS, NON_ALPHANUM, isString } from './utils';
+import { EVERY_FOUR_CHARS, isString, validateAndFormat } from './utils';
 import type { Specification } from './specification';
 
 export const getCountry = (countryCode: string): Specification => {
@@ -12,8 +12,13 @@ export const getCountry = (countryCode: string): Specification => {
   return countryStructure;
 };
 
-export const electronicFormat = (iban: string): string =>
-  iban.replaceAll(NON_ALPHANUM, '').toUpperCase();
+export const electronicFormat = (iban: string): string => {
+  if (!isString(iban)) {
+    throw new Error('IBAN must be a string');
+  }
+
+  return validateAndFormat(iban, true);
+};
 
 /**
  * Check if an IBAN is valid. Does not throw an error if the IBAN is invalid.
@@ -23,9 +28,8 @@ export const electronicFormat = (iban: string): string =>
 export const isValid = (iban: string): boolean => {
   if (!isString(iban)) return false;
 
-  const ibanFormatted = electronicFormat(iban);
-
   try {
+    const ibanFormatted = electronicFormat(iban);
     const countryStructure = getCountry(ibanFormatted.slice(0, 2));
 
     return countryStructure.isValid(ibanFormatted);
@@ -41,6 +45,10 @@ export const isValid = (iban: string): boolean => {
  * @returns {string} the BBAN
  */
 export const toBBAN = (iban: string, separator: string = ' '): string => {
+  if (!isString(iban)) {
+    throw new Error('IBAN must be a string');
+  }
+
   const ibanFormatted = electronicFormat(iban);
 
   return getCountry(ibanFormatted.slice(0, 2)).toBBAN(ibanFormatted, separator);
@@ -54,8 +62,17 @@ export const toBBAN = (iban: string, separator: string = ' '): string => {
  * @param {string} bban the BBAN to convert to IBAN
  * @returns {string} the IBAN
  */
-export const fromBBAN = (countryCode: string, bban: string): string =>
-  getCountry(countryCode).fromBBAN(electronicFormat(bban));
+export const fromBBAN = (countryCode: string, bban: string): string => {
+  if (!isString(countryCode)) {
+    throw new Error('Country code must be a string');
+  }
+
+  if (!isString(bban)) {
+    throw new Error('BBAN must be a string');
+  }
+
+  return getCountry(countryCode).fromBBAN(validateAndFormat(bban, false));
+};
 
 /**
  * Check the validity of the passed BBAN.
@@ -64,9 +81,13 @@ export const fromBBAN = (countryCode: string, bban: string): string =>
  * @returns {boolean} true if the passed BBAN is valid, false otherwise
  */
 export const isValidBBAN = (countryCode: string, bban: string): boolean => {
-  if (!isString(bban)) return false;
+  if (!isString(countryCode) || !isString(bban)) return false;
 
-  return getCountry(countryCode).isValidBBAN(electronicFormat(bban));
+  try {
+    return getCountry(countryCode).isValidBBAN(validateAndFormat(bban, false));
+  } catch {
+    return false;
+  }
 };
 
 /**
@@ -75,8 +96,13 @@ export const isValidBBAN = (countryCode: string, bban: string): boolean => {
  * @param {string} [separator] the separator to use between the blocks of the BBAN, defaults to ' '
  * @returns {string} the formatted IBAN
  */
-export const printFormat = (iban: string, separator: string = ' '): string =>
-  electronicFormat(iban).replaceAll(EVERY_FOUR_CHARS, `$1${separator}`);
+export const printFormat = (iban: string, separator: string = ' '): string => {
+  if (!isString(iban)) {
+    throw new Error('IBAN must be a string');
+  }
+
+  return electronicFormat(iban).replaceAll(EVERY_FOUR_CHARS, `$1${separator}`);
+};
 
 export const availableCountries = (): { [key: string]: Specification } =>
   COUNTRIES;
