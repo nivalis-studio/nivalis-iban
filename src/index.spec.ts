@@ -84,6 +84,21 @@ describe('IBAN', () => {
     it('should format a print-formatted belgian IBAN', () => {
       expect(electronicFormat('BE68 5390 0754 7034')).toBe('BE68539007547034');
     });
+
+    it('should throw an error for non-string input', () => {
+      // @ts-expect-error test the case of an invalid param type
+      expect(() => electronicFormat(123)).toThrow('IBAN must be a string');
+    });
+
+    it('should throw an error for IBAN that is too long', () => {
+      const tooLongIban = 'BE68539007547034'.repeat(3); // 48 characters
+
+      expect(() => electronicFormat(tooLongIban)).toThrow('Input too long');
+    });
+
+    it('should throw an error for IBAN that is too short', () => {
+      expect(() => electronicFormat('BE68')).toThrow('IBAN too short');
+    });
   });
 
   describe('.printFormat', () => {
@@ -94,6 +109,11 @@ describe('IBAN', () => {
     it('should format a print-formatted belgian IBAN', () => {
       expect(printFormat('BE68 5390 0754 7034')).toBe('BE68 5390 0754 7034');
     });
+
+    it('should throw an error for non-string input', () => {
+      // @ts-expect-error test the case of an invalid param type
+      expect(() => printFormat(123)).toThrow('IBAN must be a string');
+    });
   });
 
   describe('.toBBAN', () => {
@@ -103,6 +123,11 @@ describe('IBAN', () => {
 
     it('should use space as default separator', () => {
       expect(toBBAN('BE68 5390 0754 7034')).toBe('539 0075470 34');
+    });
+
+    it('should throw an error for non-string input', () => {
+      // @ts-expect-error test the case of an invalid param type
+      expect(() => toBBAN(123)).toThrow('IBAN must be a string');
     });
   });
 
@@ -119,6 +144,18 @@ describe('IBAN', () => {
       expect(() => {
         fromBBAN('BE', '1539-0075470-34');
       }).toThrowError(/Invalid BBAN/);
+    });
+
+    it('should throw an error for non-string countryCode', () => {
+      // @ts-expect-error test the case of an invalid param type
+      expect(() => fromBBAN(123, '539007547034')).toThrow(
+        'Country code must be a string',
+      );
+    });
+
+    it('should throw an error for non-string BBAN', () => {
+      // @ts-expect-error test the case of an invalid param type
+      expect(() => fromBBAN('BE', 123)).toThrow('BBAN must be a string');
     });
   });
 
@@ -152,6 +189,11 @@ describe('IBAN', () => {
 
     it('should detect invalid BBAN format', () => {
       expect(isValidBBAN('BE', 'ABC-0075470-34')).toBe(false);
+    });
+
+    it('should return false for non-string countryCode', () => {
+      // @ts-expect-error test the case of an invalid param type
+      expect(isValidBBAN(123, '539007547034')).toBe(false);
     });
   });
 });
