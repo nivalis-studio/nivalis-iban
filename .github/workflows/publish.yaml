@@ -38,11 +38,8 @@ jobs:
       #   run: npm publish --provenance --access public
 
       - name: Setup npm
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           npm config set @nivalis:registry=https://registry.npmjs.org
-          npm config set //registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}
 
       - name: Publish
         run: npm publish --provenance --access public
