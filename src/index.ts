@@ -2,6 +2,13 @@ import { COUNTRIES } from './countries';
 import { EVERY_FOUR_CHARS, isString, validateAndFormat } from './utils';
 import type { Specification } from './specification';
 
+const IMMUTABLE_COUNTRIES: Readonly<Record<string, Specification>> =
+  Object.freeze(
+    Object.fromEntries(
+      Object.entries(COUNTRIES).map(([code, spec]) => [code, spec.clone()]),
+    ),
+  );
+
 export const getCountry = (countryCode: string): Specification => {
   const normalizedCountryCode = countryCode.toUpperCase().trim();
   const countryStructure = COUNTRIES[normalizedCountryCode];
@@ -111,9 +118,4 @@ export const printFormat = (iban: string, separator = ' '): string => {
 
 export const availableCountries = (): Readonly<{
   [key: string]: Specification;
-}> =>
-  Object.freeze(
-    Object.fromEntries(
-      Object.entries(COUNTRIES).map(([code, spec]) => [code, spec.clone()]),
-    ),
-  );
+}> => IMMUTABLE_COUNTRIES;
