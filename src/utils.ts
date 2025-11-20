@@ -28,13 +28,13 @@ export const validateAndFormat = (
     throw new Error('Input must be a string');
   }
 
-  if (input.length > MAX_IBAN_LENGTH) {
+  const formatted = input.replaceAll(NON_ALPHANUM, '').toUpperCase();
+
+  if (formatted.length > MAX_IBAN_LENGTH) {
     throw new Error(
       `Input too long: maximum ${MAX_IBAN_LENGTH} characters allowed`,
     );
   }
-
-  const formatted = input.replaceAll(NON_ALPHANUM, '').toUpperCase();
 
   if (requireMinLength && formatted.length < MIN_IBAN_LENGTH) {
     throw new Error(
