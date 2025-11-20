@@ -9,6 +9,8 @@ import {
   toBBAN,
 } from './index';
 
+const INVALID_BBAN_REGEX = /Invalid BBAN/;
+
 describe('IBAN', () => {
   describe('.isValid', () => {
     it('should return false when input is not a String', () => {
@@ -54,8 +56,13 @@ describe('IBAN', () => {
       const countryList = availableCountries();
 
       for (const countryCode of Object.keys(countryList)) {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        expect(isValid(countryList[countryCode]!.example)).toBe(true);
+        const country = countryList[countryCode];
+
+        if (!country) {
+          throw new Error(`Missing country specification for ${countryCode}`);
+        }
+
+        expect(isValid(country.example)).toBe(true);
       }
     });
 
@@ -63,8 +70,13 @@ describe('IBAN', () => {
       const countryList = availableCountries();
 
       for (const countryCode of Object.keys(countryList)) {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        let num = countryList[countryCode]!.example;
+        const country = countryList[countryCode];
+
+        if (!country) {
+          throw new Error(`Missing country specification for ${countryCode}`);
+        }
+
+        let num = country.example;
 
         num = `${num.slice(0, -1)}${(Number.parseInt(num.slice(-1), 10) + 1) % 10}`;
         expect(isValid(num)).toBe(false);
@@ -143,7 +155,7 @@ describe('IBAN', () => {
     it('should throw an error if the BBAN is invalid', () => {
       expect(() => {
         fromBBAN('BE', '1539-0075470-34');
-      }).toThrowError(/Invalid BBAN/);
+      }).toThrowError(INVALID_BBAN_REGEX);
     });
 
     it('should throw an error for non-string countryCode', () => {

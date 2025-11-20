@@ -22,7 +22,7 @@ export const isString = (value: unknown): value is string =>
  */
 export const validateAndFormat = (
   input: string,
-  requireMinLength: boolean = true,
+  requireMinLength = true,
 ): string => {
   if (!isString(input)) {
     throw new Error('Input must be a string');

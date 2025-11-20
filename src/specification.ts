@@ -12,13 +12,16 @@ const parseStructure = (structure: string): RegExp => {
   // split in blocks of 3 chars
   const regex = structure.match(/.{3}/g)?.map(block => {
     // parse each structure block (1-char + 2-digits)
-    let format;
+    let format: string;
 
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const pattern = block[0]!;
+    const pattern = block.charAt(0);
+
+    if (!pattern) {
+      throw new Error('Invalid structure block');
+    }
+
     const repeats = Number.parseInt(block.slice(1), 10);
 
-    // eslint-disable-next-line default-case
     switch (pattern) {
       case 'A': {
         format = '0-9A-Za-z';
@@ -61,10 +64,13 @@ const parseStructure = (structure: string): RegExp => {
 
         break;
       }
+
+      default: {
+        throw new Error(`Unknown structure pattern "${pattern}"`);
+      }
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion, @typescript-eslint/no-non-null-assertion
-    return `([${format!}]{${repeats}})`;
+    return `([${format}]{${repeats}})`;
   });
 
   if (!regex) {
@@ -81,10 +87,9 @@ const parseStructure = (structure: string): RegExp => {
  */
 const iso7064Mod9710 = (iban: string): number => {
   let remainder = iban;
-  let block;
 
   while (remainder.length > 2) {
-    block = remainder.slice(0, 9);
+    const block = remainder.slice(0, 9);
     remainder = `${Number.parseInt(block, 10) % 97}${remainder.slice(block.length)}`;
   }
 
@@ -102,10 +107,15 @@ const iso13616Prepare = (iban: string): string => {
 
   val = val.slice(4) + val.slice(0, 4);
 
-  return val.replaceAll(/[A-Z]/g, match =>
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    (match.codePointAt(0)! - A_CODE_POINT_AT + 10).toString(),
-  );
+  return val.replaceAll(/[A-Z]/g, match => {
+    const codePoint = match.codePointAt(0);
+
+    if (codePoint === undefined) {
+      throw new Error('Invalid character in IBAN');
+    }
+
+    return (codePoint - A_CODE_POINT_AT + 10).toString();
+  });
 };
 
 /**
@@ -117,21 +127,30 @@ const iso13616Prepare = (iban: string): string => {
  * @class
  */
 export class Specification {
+  countryCode: string;
+  example: string;
+  private readonly length: number;
+  private readonly structure: string;
   private cachedRegex: RegExp | undefined;
 
   constructor(
-    public countryCode: string,
-    private length: number,
-    private structure: string,
-    public example: string,
-  ) {}
+    countryCode: string,
+    length: number,
+    structure: string,
+    example: string,
+  ) {
+    this.countryCode = countryCode;
+    this.length = length;
+    this.structure = structure;
+    this.example = example;
+  }
 
   /**
    * Check if the passed iban is valid according to this specification.
    * @param {string} iban the iban to validate
    * @returns {boolean} true if valid, false otherwise
    */
-  public isValid(iban: string): boolean {
+  isValid(iban: string): boolean {
     return (
       this.length === iban.length &&
       this.countryCode === iban.slice(0, 2) &&
@@ -146,7 +165,7 @@ export class Specification {
    * @param {string} separator the separator to use between BBAN blocks
    * @returns {string} the BBAN
    */
-  public toBBAN(iban: string, separator: string): string {
+  toBBAN(iban: string, separator: string): string {
     const regexMatch = this.regex().exec(iban.slice(4));
 
     if (!regexMatch) {
@@ -163,7 +182,7 @@ export class Specification {
    * @param {string} bban the BBAN to convert to IBAN
    * @returns {string} the IBAN
    */
-  public fromBBAN(bban: string): string {
+  fromBBAN(bban: string): string {
     if (!this.isValidBBAN(bban)) {
       throw new Error('Invalid BBAN');
     }
@@ -183,7 +202,7 @@ export class Specification {
    * @param {string} bban the BBAN to validate
    * @returns {boolean} true if the passed bban is a valid BBAN according to this specification, false otherwise
    */
-  public isValidBBAN(bban: string): boolean {
+  isValidBBAN(bban: string): boolean {
     return this.length - 4 === bban.length && this.regex().test(bban);
   }
 

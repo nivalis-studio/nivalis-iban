@@ -26,7 +26,9 @@ export const electronicFormat = (iban: string): string => {
  * @returns {boolean} true if the passed IBAN is valid, false otherwise
  */
 export const isValid = (iban: string): boolean => {
-  if (!isString(iban)) return false;
+  if (!isString(iban)) {
+    return false;
+  }
 
   try {
     const ibanFormatted = electronicFormat(iban);
@@ -44,7 +46,7 @@ export const isValid = (iban: string): boolean => {
  * @param {string} [separator] the separator to use between the blocks of the BBAN, defaults to ' '
  * @returns {string} the BBAN
  */
-export const toBBAN = (iban: string, separator: string = ' '): string => {
+export const toBBAN = (iban: string, separator = ' '): string => {
   if (!isString(iban)) {
     throw new Error('IBAN must be a string');
   }
@@ -81,7 +83,9 @@ export const fromBBAN = (countryCode: string, bban: string): string => {
  * @returns {boolean} true if the passed BBAN is valid, false otherwise
  */
 export const isValidBBAN = (countryCode: string, bban: string): boolean => {
-  if (!isString(countryCode) || !isString(bban)) return false;
+  if (!(isString(countryCode) && isString(bban))) {
+    return false;
+  }
 
   try {
     return getCountry(countryCode).isValidBBAN(validateAndFormat(bban, false));
@@ -96,7 +100,7 @@ export const isValidBBAN = (countryCode: string, bban: string): boolean => {
  * @param {string} [separator] the separator to use between the blocks of the BBAN, defaults to ' '
  * @returns {string} the formatted IBAN
  */
-export const printFormat = (iban: string, separator: string = ' '): string => {
+export const printFormat = (iban: string, separator = ' '): string => {
   if (!isString(iban)) {
     throw new Error('IBAN must be a string');
   }
