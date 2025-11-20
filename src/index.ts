@@ -108,5 +108,11 @@ export const printFormat = (iban: string, separator = ' '): string => {
   return electronicFormat(iban).replaceAll(EVERY_FOUR_CHARS, `$1${separator}`);
 };
 
-export const availableCountries = (): { [key: string]: Specification } =>
-  COUNTRIES;
+export const availableCountries = (): Readonly<{
+  [key: string]: Specification;
+}> =>
+  Object.freeze(
+    Object.fromEntries(
+      Object.entries(COUNTRIES).map(([code, spec]) => [code, spec.clone()]),
+    ),
+  );

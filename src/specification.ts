@@ -145,6 +145,18 @@ export class Specification {
     this.example = example;
   }
 
+  clone(): Specification {
+    const duplicate = new Specification(
+      this.countryCode,
+      this.length,
+      this.structure,
+      this.example,
+    );
+    duplicate.cachedRegex = this.cachedRegex;
+
+    return duplicate;
+  }
+
   /**
    * Check if the passed iban is valid according to this specification.
    * @param {string} iban the iban to validate
