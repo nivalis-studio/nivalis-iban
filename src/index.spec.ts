@@ -28,6 +28,10 @@ describe('IBAN', () => {
       expect(isValid('ZZ68539007547034')).toBe(false);
     });
 
+    it('should parse long IBANs', () => {
+      expect(isValid('MT84 MALT 0110 0001 2345 MTL CAST 001S')).toBe(true);
+    });
+
     it('should return true for a valid belgian IBAN', () => {
       expect(isValid('BE68539007547034')).toBe(true);
     });
@@ -115,6 +119,14 @@ describe('IBAN', () => {
     it('should throw an error for IBAN that is too short', () => {
       expect(() => electronicFormat('BE68')).toThrow('IBAN too short');
     });
+
+    it('should sanitize grouped long IBANs before enforcing length', () => {
+      const groupedMalta = 'MT84 MALT-0110 0001 2345 MTL CAST 001S';
+
+      expect(electronicFormat(groupedMalta)).toBe(
+        'MT84MALT011000012345MTLCAST001S',
+      );
+    });
   });
 
   describe('.printFormat', () => {
@@ -129,6 +141,14 @@ describe('IBAN', () => {
     it('should throw an error for non-string input', () => {
       // @ts-expect-error test the case of an invalid param type
       expect(() => printFormat(123)).toThrow('IBAN must be a string');
+    });
+
+    it('should sanitize grouped long IBANs before formatting', () => {
+      const groupedSaintLucia = 'LC07 HEMM-0001 0001-0012 0012-0001 3015';
+
+      expect(printFormat(groupedSaintLucia)).toBe(
+        'LC07 HEMM 0001 0001 0012 0012 0001 3015',
+      );
     });
   });
 
