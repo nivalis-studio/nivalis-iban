@@ -18,7 +18,7 @@ jobs:
       - name: Check typescript
         run: bun run ts
 
-      - name: Check eslint
+      - name: Check linter
         run: bun run lint
 
       - name: Check tests
