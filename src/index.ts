@@ -1,7 +1,7 @@
 import { COUNTRIES, COUNTRY_CODES } from './countries';
 import { EVERY_FOUR_CHARS, isString, validateAndFormat } from './utils';
 import type { CountryCode } from './countries';
-import type { Specification } from './specification';
+import type { BbanDescription, Specification } from './specification';
 
 const IMMUTABLE_COUNTRIES: Readonly<Record<CountryCode, Specification>> =
   Object.freeze(
@@ -88,6 +88,36 @@ export const validate = (iban: string): ValidationResult => {
  * @returns {boolean} true if the passed IBAN is valid, false otherwise
  */
 export const isValid = (iban: string): boolean => validate(iban).ok;
+
+export interface DescribeResult extends BbanDescription {
+  country: CountryCode;
+  iban: string;
+  bban: string;
+}
+
+/**
+ * Provide the parsed BBAN blocks and regex groups for a given IBAN.
+ * @param {string} iban the IBAN to describe
+ * @returns {DescribeResult} metadata describing each BBAN block
+ */
+export const describe = (iban: string): DescribeResult => {
+  if (!isString(iban)) {
+    throw new Error('IBAN must be a string');
+  }
+
+  const ibanFormatted = electronicFormat(iban);
+  const specification = getCountry(ibanFormatted.slice(0, 2));
+  const bban = ibanFormatted.slice(4);
+  const { blocks, groups } = specification.describeBBAN(bban);
+
+  return {
+    country: specification.countryCode as CountryCode,
+    iban: ibanFormatted,
+    bban,
+    blocks,
+    groups,
+  };
+};
 
 /**
  * Convert an IBAN to a BBAN. Throws an error if the passed IBAN is invalid.

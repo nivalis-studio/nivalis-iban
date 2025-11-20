@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'bun:test';
 import {
   availableCountries,
+  describe as describeIban,
   electronicFormat,
   fromBBAN,
   isValid,
@@ -99,6 +100,27 @@ describe('IBAN', () => {
 
     it('should return true for a valid Egypt IBAN', () => {
       expect(isValid('EG800002000156789012345180002')).toBe(true);
+    });
+  });
+
+  describe('.describe', () => {
+    it('should throw an error for non-string input', () => {
+      // @ts-expect-error test the case of an invalid param type
+      expect(() => describeIban(123)).toThrow('IBAN must be a string');
+    });
+
+    it('should expose block metadata for a Belgian IBAN', () => {
+      const details = describeIban('BE68 5390 0754 7034');
+
+      expect(details.country).toBe('BE');
+      expect(details.iban).toBe('BE68539007547034');
+      expect(details.bban).toBe('539007547034');
+      expect(details.groups).toEqual(['539', '0075470', '34']);
+      expect(details.blocks).toEqual([
+        { pattern: 'F', length: 3, offset: 0, index: 0, value: '539' },
+        { pattern: 'F', length: 7, offset: 3, index: 1, value: '0075470' },
+        { pattern: 'F', length: 2, offset: 10, index: 2, value: '34' },
+      ]);
     });
   });
 

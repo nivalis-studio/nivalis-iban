@@ -1,26 +1,61 @@
 import { A_CODE_POINT_AT } from './utils';
 
+export type StructurePattern = 'A' | 'B' | 'C' | 'F' | 'L' | 'U' | 'W';
+
+export type StructureBlockMetadata = {
+  pattern: StructurePattern;
+  length: number;
+  offset: number;
+  index: number;
+};
+
+export type BbanBlockDescription = StructureBlockMetadata & {
+  value: string;
+};
+
+export type BbanDescription = {
+  groups: Array<string>;
+  blocks: Array<BbanBlockDescription>;
+};
+
+type StructureMetadata = {
+  regex: RegExp;
+  blocks: Array<StructureBlockMetadata>;
+};
+
 /**
- * Parse the BBAN structure used to configure each IBAN Specification and returns a matching regular expression.
+ * Parse the BBAN structure used to configure each IBAN Specification and return both the matching
+ * regular expression and the block metadata.
  * A structure is composed of blocks of 3 characters (one letter and 2 digits). Each block represents
  * a logical group in the typical representation of the BBAN. For each group, the letter indicates which characters
  * are allowed in this group and the following 2-digits number tells the length of the group.
  * @param {string} structure the structure to parse
- * @returns {RegExp} the regular expression
+ * @returns {StructureMetadata} the parsed metadata
  */
-const parseStructure = (structure: string): RegExp => {
-  // split in blocks of 3 chars
-  const regex = structure.match(/.{3}/g)?.map(block => {
-    // parse each structure block (1-char + 2-digits)
+const parseStructure = (structure: string): StructureMetadata => {
+  const blockChunks = structure.match(/.{3}/g);
+
+  if (!blockChunks) {
+    throw new Error('Something went wrong while parsing the structure');
+  }
+
+  const blocks: Array<StructureBlockMetadata> = [];
+  let offset = 0;
+
+  const regexParts = blockChunks.map((chunk, index) => {
     let format: string;
 
-    const pattern = block.charAt(0);
+    const pattern = chunk.charAt(0) as StructurePattern;
 
     if (!pattern) {
       throw new Error('Invalid structure block');
     }
 
-    const repeats = Number.parseInt(block.slice(1), 10);
+    const repeats = Number.parseInt(chunk.slice(1), 10);
+
+    if (Number.isNaN(repeats)) {
+      throw new Error('Invalid structure block length');
+    }
 
     switch (pattern) {
       case 'A': {
@@ -70,14 +105,22 @@ const parseStructure = (structure: string): RegExp => {
       }
     }
 
+    blocks.push({
+      pattern,
+      length: repeats,
+      offset,
+      index,
+    });
+
+    offset += repeats;
+
     return `([${format}]{${repeats}})`;
   });
 
-  if (!regex) {
-    throw new Error('Something went wrong while parsing the structure');
-  }
-
-  return new RegExp(`^${regex.join('')}$`);
+  return {
+    regex: new RegExp(`^${regexParts.join('')}$`),
+    blocks,
+  };
 };
 
 /**
@@ -131,7 +174,7 @@ export class Specification {
   example: string;
   private readonly length: number;
   private readonly structure: string;
-  private cachedRegex: RegExp | undefined;
+  private cachedStructure: StructureMetadata | undefined;
 
   constructor(
     countryCode: string,
@@ -152,7 +195,7 @@ export class Specification {
       this.structure,
       this.example,
     );
-    duplicate.cachedRegex = this.cachedRegex;
+    duplicate.cachedStructure = this.cachedStructure;
 
     return duplicate;
   }
@@ -188,6 +231,38 @@ export class Specification {
   }
 
   /**
+   * Describe the BBAN part of an IBAN using the specification structure metadata.
+   * @param {string} bban the BBAN to describe
+   * @returns {BbanDescription} extracted block metadata and regex groups
+   */
+  describeBBAN(bban: string): BbanDescription {
+    const metadata = this.structureMetadata();
+    const regexMatch = metadata.regex.exec(bban);
+
+    if (!regexMatch) {
+      throw new Error('Invalid IBAN');
+    }
+
+    const groups = regexMatch.slice(1);
+
+    return {
+      groups,
+      blocks: metadata.blocks.map((block, index) => {
+        const value = groups[index];
+
+        if (value === undefined) {
+          throw new Error('Invalid IBAN');
+        }
+
+        return {
+          ...block,
+          value,
+        };
+      }),
+    };
+  }
+
+  /**
    * Convert the passed BBAN to an IBAN for this country specification.
    * Please note that <i>"generation of the IBAN shall be the exclusive responsibility of the bank/branch servicing the account"</i>.
    * This method implements the preferred algorithm described in http://en.wikipedia.org/wiki/International_Bank_Account_Number#Generating_IBAN_check_digits
@@ -219,12 +294,20 @@ export class Specification {
   }
 
   /**
+   * Expose the BBAN parsing metadata and regex for reuse without reparsing.
+   * @returns {StructureMetadata} Structure metadata
+   */
+  private structureMetadata(): StructureMetadata {
+    this.cachedStructure ??= parseStructure(this.structure);
+
+    return this.cachedStructure;
+  }
+
+  /**
    * Lazy-loaded regex (parse the structure and construct the regular expression the first time we need it for validation)
    * @returns {RegExp} Regexp
    */
   private regex(): RegExp {
-    this.cachedRegex ??= parseStructure(this.structure);
-
-    return this.cachedRegex;
+    return this.structureMetadata().regex;
   }
 }

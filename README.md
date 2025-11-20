@@ -82,6 +82,29 @@ Possible `error` codes are:
 - `bad_length` – the IBAN is too short/long or has an invalid BBAN structure for its country
 - `mod97_failure` – the checksum (ISO 7064 Mod 97-10) does not evaluate to 1
 
+### `describe(iban: string): DescribeResult`
+
+Exposes the parsed BBAN blocks for a given IBAN so you can display the bank/branch/account slices without reimplementing the ISO structure tables.
+
+The returned object contains:
+
+- `country` – ISO country code detected from the IBAN
+- `iban` / `bban` – sanitized electronic representations
+- `groups` – raw regex capture groups, matching the BBAN blocks in order
+- `blocks` – metadata for each BBAN block including `pattern`, `length`, `offset`, `index`, and the extracted `value`
+
+```typescript
+import { describe } from '@nivalis/iban';
+
+const { country, blocks } = describe('BE68 5390 0754 7034');
+// country === 'BE'
+// blocks === [
+//   { pattern: 'F', length: 3, offset: 0, index: 0, value: '539' },
+//   { pattern: 'F', length: 7, offset: 3, index: 1, value: '0075470' },
+//   { pattern: 'F', length: 2, offset: 10, index: 2, value: '34' },
+// ];
+```
+
 ### `electronicFormat(iban: string): string`
 
 Converts an IBAN to electronic format (removes spaces and converts to uppercase).
