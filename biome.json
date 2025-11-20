@@ -1,0 +1,9 @@
+{
+	"$schema": "https://biomejs.dev/schemas/2.3.6/schema.json",
+	"extends": ["@nivalis/biome-config"],
+	"linter": {
+		"rules": {
+			"style": { "noMagicNumbers": "off" }
+		}
+	}
+}

@@ -3,6 +3,20 @@ commit-msg:
     commitlint:
       run: bun commitlint --edit
 pre-commit:
-  commands:
-    lint:
-      run: bun lint-staged
+  parallel: true
+  jobs:
+    - run: bun biome check --write --no-errors-on-unmatched --files-ignore-unknown=true --colors=off {staged_files}
+      glob:
+        - "*.cjs"
+        - "*.mjs"
+        - "*.d.cts"
+        - "*.d.mts"
+        - "*.js"
+        - "*.jsx"
+        - "*.ts"
+        - "*.tsx"
+        - "*.json"
+        - "*.jsonc"
+        - "*.css"
+      stage_fixed: true
+    - run: bun run ts
