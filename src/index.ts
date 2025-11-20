@@ -32,6 +32,15 @@ export function getCountry(countryCode: string): Specification {
   return countryStructure;
 }
 
+export type ValidationError =
+  | 'unknown_country'
+  | 'bad_length'
+  | 'mod97_failure';
+
+export type ValidationResult =
+  | { ok: true }
+  | { ok: false; error: ValidationError };
+
 export const electronicFormat = (iban: string): string => {
   if (!isString(iban)) {
     throw new Error('IBAN must be a string');
@@ -41,24 +50,44 @@ export const electronicFormat = (iban: string): string => {
 };
 
 /**
+ * Validate an IBAN without throwing, returning structured error information.
+ * @param {string} iban the IBAN to validate
+ * @returns {ValidationResult} the validation status and optional error code
+ */
+export const validate = (iban: string): ValidationResult => {
+  let ibanFormatted: string;
+  try {
+    ibanFormatted = electronicFormat(iban);
+  } catch {
+    return { ok: false, error: 'bad_length' };
+  }
+
+  let countryStructure: Specification;
+  try {
+    countryStructure = getCountry(ibanFormatted.slice(0, 2));
+  } catch {
+    return { ok: false, error: 'unknown_country' };
+  }
+
+  const bban = ibanFormatted.slice(4);
+
+  if (!countryStructure.isValidBBAN(bban)) {
+    return { ok: false, error: 'bad_length' };
+  }
+
+  if (!countryStructure.isValid(ibanFormatted)) {
+    return { ok: false, error: 'mod97_failure' };
+  }
+
+  return { ok: true };
+};
+
+/**
  * Check if an IBAN is valid. Does not throw an error if the IBAN is invalid.
  * @param {string} iban the IBAN to validate.
  * @returns {boolean} true if the passed IBAN is valid, false otherwise
  */
-export const isValid = (iban: string): boolean => {
-  if (!isString(iban)) {
-    return false;
-  }
-
-  try {
-    const ibanFormatted = electronicFormat(iban);
-    const countryStructure = getCountry(ibanFormatted.slice(0, 2));
-
-    return countryStructure.isValid(ibanFormatted);
-  } catch {
-    return false;
-  }
-};
+export const isValid = (iban: string): boolean => validate(iban).ok;
 
 /**
  * Convert an IBAN to a BBAN. Throws an error if the passed IBAN is invalid.

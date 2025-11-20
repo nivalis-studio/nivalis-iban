@@ -7,6 +7,7 @@ import {
   isValidBBAN,
   printFormat,
   toBBAN,
+  validate,
 } from './index';
 import type { CountryCode } from './countries';
 
@@ -98,6 +99,35 @@ describe('IBAN', () => {
 
     it('should return true for a valid Egypt IBAN', () => {
       expect(isValid('EG800002000156789012345180002')).toBe(true);
+    });
+  });
+
+  describe('.validate', () => {
+    it('should return ok true for a valid IBAN', () => {
+      expect(validate('BE68539007547034')).toEqual({ ok: true });
+    });
+
+    it('should classify a short IBAN as bad_length', () => {
+      expect(validate('BE68')).toEqual({ ok: false, error: 'bad_length' });
+    });
+
+    it('should detect unknown countries', () => {
+      expect(validate('ZZ68539007547034')).toEqual({
+        ok: false,
+        error: 'unknown_country',
+      });
+    });
+
+    it('should surface mod97 failures', () => {
+      expect(validate('BE68539007547035')).toEqual({
+        ok: false,
+        error: 'mod97_failure',
+      });
+    });
+
+    it('should return bad_length when input is not a string', () => {
+      // @ts-expect-error test the case of an invalid param type
+      expect(validate(123)).toEqual({ ok: false, error: 'bad_length' });
     });
   });
 

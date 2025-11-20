@@ -62,6 +62,26 @@ isValid('BE68539007547035'); // false
 isValid('invalid'); // false
 ```
 
+### `validate(iban: string): ValidationResult`
+
+Runs the same validation as `isValid` but returns structured error information instead of throwing exceptions.
+
+```typescript
+import { validate } from '@nivalis/iban';
+
+const result = validate('GB29NWBK60161331926819');
+// { ok: true }
+
+const failed = validate('ZZ68539007547034');
+// { ok: false, error: 'unknown_country' }
+```
+
+Possible `error` codes are:
+
+- `unknown_country` – the IBAN prefix is not part of the ISO registry supported by the library
+- `bad_length` – the IBAN is too short/long or has an invalid BBAN structure for its country
+- `mod97_failure` – the checksum (ISO 7064 Mod 97-10) does not evaluate to 1
+
 ### `electronicFormat(iban: string): string`
 
 Converts an IBAN to electronic format (removes spaces and converts to uppercase).
