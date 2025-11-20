@@ -8,6 +8,7 @@ import {
   printFormat,
   toBBAN,
 } from './index';
+import type { CountryCode } from './countries';
 
 const INVALID_BBAN_REGEX = /Invalid BBAN/;
 
@@ -63,7 +64,9 @@ describe('IBAN', () => {
     it('should return true for all examples', () => {
       const countryList = availableCountries();
 
-      for (const countryCode of Object.keys(countryList)) {
+      for (const countryCode of Object.keys(
+        countryList,
+      ) as Array<CountryCode>) {
         const country = countryList[countryCode];
 
         if (!country) {
@@ -77,7 +80,9 @@ describe('IBAN', () => {
     it('should return false for all examples when modifying just one digit', () => {
       const countryList = availableCountries();
 
-      for (const countryCode of Object.keys(countryList)) {
+      for (const countryCode of Object.keys(
+        countryList,
+      ) as Array<CountryCode>) {
         const country = countryList[countryCode];
 
         if (!country) {

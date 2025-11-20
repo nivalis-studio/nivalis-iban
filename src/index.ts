@@ -1,15 +1,27 @@
-import { COUNTRIES } from './countries';
+import { COUNTRIES, COUNTRY_CODES } from './countries';
 import { EVERY_FOUR_CHARS, isString, validateAndFormat } from './utils';
+import type { CountryCode } from './countries';
 import type { Specification } from './specification';
 
-const IMMUTABLE_COUNTRIES: Readonly<Record<string, Specification>> =
+const IMMUTABLE_COUNTRIES: Readonly<Record<CountryCode, Specification>> =
   Object.freeze(
     Object.fromEntries(
-      Object.entries(COUNTRIES).map(([code, spec]) => [code, spec.clone()]),
-    ),
+      COUNTRY_CODES.map(code => {
+        const specification = COUNTRIES[code];
+
+        if (!specification) {
+          throw new Error(`Missing country specification for ${code}`);
+        }
+
+        return [code, specification.clone()];
+      }),
+    ) as Record<CountryCode, Specification>,
   );
 
-export const getCountry = (countryCode: string): Specification => {
+/* biome-ignore lint/style/useUnifiedTypeSignatures: Overloads distinguish typed vs runtime country codes */
+export function getCountry(countryCode: CountryCode): Specification;
+export function getCountry(countryCode: string): Specification;
+export function getCountry(countryCode: string): Specification {
   const normalizedCountryCode = countryCode.toUpperCase().trim();
   const countryStructure = COUNTRIES[normalizedCountryCode];
 
@@ -18,7 +30,7 @@ export const getCountry = (countryCode: string): Specification => {
   }
 
   return countryStructure;
-};
+}
 
 export const electronicFormat = (iban: string): string => {
   if (!isString(iban)) {
@@ -68,11 +80,14 @@ export const toBBAN = (iban: string, separator = ' '): string => {
  * Convert the passed BBAN to an IBAN for this country specification.
  * Please note that <i>"generation of the IBAN shall be the exclusive responsibility of the bank/branch servicing the account"</i>.
  * This method implements the preferred algorithm described in http://en.wikipedia.org/wiki/International_Bank_Account_Number#Generating_IBAN_check_digits
- * @param {string} countryCode the country of the BBAN
+ * @param {CountryCode} countryCode the country of the BBAN
  * @param {string} bban the BBAN to convert to IBAN
  * @returns {string} the IBAN
  */
-export const fromBBAN = (countryCode: string, bban: string): string => {
+/* biome-ignore lint/style/useUnifiedTypeSignatures: Overloads distinguish typed vs runtime country codes */
+export function fromBBAN(countryCode: CountryCode, bban: string): string;
+export function fromBBAN(countryCode: string, bban: string): string;
+export function fromBBAN(countryCode: string, bban: string): string {
   if (!isString(countryCode)) {
     throw new Error('Country code must be a string');
   }
@@ -82,15 +97,18 @@ export const fromBBAN = (countryCode: string, bban: string): string => {
   }
 
   return getCountry(countryCode).fromBBAN(validateAndFormat(bban, false));
-};
+}
 
 /**
  * Check the validity of the passed BBAN.
- * @param {string} countryCode the country of the BBAN
+ * @param {CountryCode} countryCode the country of the BBAN
  * @param {string} bban the BBAN to check the validity of
  * @returns {boolean} true if the passed BBAN is valid, false otherwise
  */
-export const isValidBBAN = (countryCode: string, bban: string): boolean => {
+/* biome-ignore lint/style/useUnifiedTypeSignatures: Overloads distinguish typed vs runtime country codes */
+export function isValidBBAN(countryCode: CountryCode, bban: string): boolean;
+export function isValidBBAN(countryCode: string, bban: string): boolean;
+export function isValidBBAN(countryCode: string, bban: string): boolean {
   if (!(isString(countryCode) && isString(bban))) {
     return false;
   }
@@ -100,7 +118,7 @@ export const isValidBBAN = (countryCode: string, bban: string): boolean => {
   } catch {
     return false;
   }
-};
+}
 
 /**
  * Format the passed IBAN to a printable format.
@@ -116,6 +134,6 @@ export const printFormat = (iban: string, separator = ' '): string => {
   return electronicFormat(iban).replaceAll(EVERY_FOUR_CHARS, `$1${separator}`);
 };
 
-export const availableCountries = (): Readonly<{
-  [key: string]: Specification;
-}> => IMMUTABLE_COUNTRIES;
+export const availableCountries = (): Readonly<
+  Record<CountryCode, Specification>
+> => IMMUTABLE_COUNTRIES;

@@ -1,6 +1,6 @@
 import { Specification } from './specification';
 
-export const COUNTRIES: { [key: string]: Specification } = {
+const COUNTRY_DEFINITIONS = {
   'AD': new Specification('AD', 24, 'F04F04A12', 'AD1200012030200359100100'),
   'AE': new Specification('AE', 23, 'F03F16', 'AE070331234567890123456'),
   'AL': new Specification('AL', 28, 'F08A16', 'AL47212110090000000235698741'),
@@ -315,4 +315,12 @@ export const COUNTRIES: { [key: string]: Specification } = {
     'F05F05A11F02',
     'WF621234512345123456789AB13',
   ),
-};
+} as const satisfies Record<string, Specification>;
+
+export const COUNTRIES: Record<string, Specification> = COUNTRY_DEFINITIONS;
+
+export const COUNTRY_CODES = Object.freeze(
+  Object.keys(COUNTRY_DEFINITIONS) as Array<keyof typeof COUNTRY_DEFINITIONS>,
+) as ReadonlyArray<keyof typeof COUNTRY_DEFINITIONS>;
+
+export type CountryCode = (typeof COUNTRY_CODES)[number];
