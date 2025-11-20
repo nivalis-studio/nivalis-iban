@@ -3,10 +3,11 @@ import { EVERY_FOUR_CHARS, isString, validateAndFormat } from './utils';
 import type { Specification } from './specification';
 
 export const getCountry = (countryCode: string): Specification => {
-  const countryStructure = COUNTRIES[countryCode];
+  const normalizedCountryCode = countryCode.toUpperCase().trim();
+  const countryStructure = COUNTRIES[normalizedCountryCode];
 
   if (!countryStructure) {
-    throw new Error(`No country with code ${countryCode}`);
+    throw new Error(`No country with code ${normalizedCountryCode}`);
   }
 
   return countryStructure;

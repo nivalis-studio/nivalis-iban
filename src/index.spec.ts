@@ -32,6 +32,10 @@ describe('IBAN', () => {
       expect(isValid('BE68539007547034')).toBe(true);
     });
 
+    it('should return true for a valid belgian IBAN', () => {
+      expect(isValid('be68539007547034')).toBe(true);
+    });
+
     it('should return true for a valid Dutch IBAN', () => {
       expect(isValid('NL86INGB0002445588')).toBe(true);
     });
@@ -148,6 +152,10 @@ describe('IBAN', () => {
       expect(fromBBAN('BE', '539007547034')).toBe('BE68539007547034');
     });
 
+    it('should output the right IBAN from a Belgian BBAN when using lowercase country code', () => {
+      expect(fromBBAN('be', '539007547034')).toBe('BE68539007547034');
+    });
+
     it('should output the right IBAN from a Belgian BBAN, ignoring format', () => {
       expect(fromBBAN('BE', '539-0075470-34')).toBe('BE68539007547034');
     });
@@ -193,6 +201,10 @@ describe('IBAN', () => {
 
     it('should validate a correct Belgian BBAN, ignoring format', () => {
       expect(isValidBBAN('BE', '539-0075470-34')).toBe(true);
+    });
+
+    it('should validate a correct lowercase Belgian BBAN, ignoring format', () => {
+      expect(isValidBBAN('be', '539-0075470-34')).toBe(true);
     });
 
     it('should detect invalid BBAN length', () => {
