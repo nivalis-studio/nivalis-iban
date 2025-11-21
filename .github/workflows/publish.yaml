@@ -9,6 +9,7 @@ on:
 permissions:
   id-token: write
   contents: read
+  packages: write
 
 jobs:
   publish:
@@ -37,7 +38,6 @@ jobs:
           {
             echo "@nivalis:registry=https://npm.pkg.github.com";
             echo "//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}";
-            echo "//npm.pkg.github.com/:always-auth=true";
           } >> "${CONFIG_PATH}"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
