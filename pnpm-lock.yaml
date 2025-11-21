@@ -4,72 +4,39 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
-catalogs:
-  default:
-    '@biomejs/biome':
-      specifier: 2.3.7
-      version: 2.3.7
-    '@commitlint/cli':
-      specifier: 20.1.0
-      version: 20.1.0
-    '@commitlint/config-conventional':
-      specifier: 20.0.0
-      version: 20.0.0
-    '@nivalis/biome-config':
-      specifier: 2.3.7
-      version: 2.3.7
-    '@total-typescript/ts-reset':
-      specifier: 0.6.1
-      version: 0.6.1
-    '@types/bun':
-      specifier: 1.3.3
-      version: 1.3.3
-    '@types/node':
-      specifier: 22.2.0
-      version: 22.2.0
-    lefthook:
-      specifier: 2.0.4
-      version: 2.0.4
-    typescript:
-      specifier: 5.9.3
-      version: 5.9.3
-    zshy:
-      specifier: 0.6.0
-      version: 0.6.0
-
 importers:
 
   .:
     devDependencies:
       '@biomejs/biome':
-        specifier: 'catalog:'
+        specifier: 2.3.7
         version: 2.3.7
       '@commitlint/cli':
-        specifier: 'catalog:'
+        specifier: 20.1.0
         version: 20.1.0(@types/node@22.2.0)(typescript@5.9.3)
       '@commitlint/config-conventional':
-        specifier: 'catalog:'
+        specifier: 20.0.0
         version: 20.0.0
       '@nivalis/biome-config':
-        specifier: 'catalog:'
+        specifier: 2.3.7
         version: 2.3.7
       '@total-typescript/ts-reset':
-        specifier: 'catalog:'
+        specifier: 0.6.1
         version: 0.6.1
       '@types/bun':
-        specifier: 'catalog:'
+        specifier: 1.3.3
         version: 1.3.3
       '@types/node':
-        specifier: 'catalog:'
+        specifier: 22.2.0
         version: 22.2.0
       lefthook:
-        specifier: 'catalog:'
+        specifier: 2.0.4
         version: 2.0.4
       typescript:
-        specifier: 'catalog:'
+        specifier: 5.9.3
         version: 5.9.3
       zshy:
-        specifier: 'catalog:'
+        specifier: 0.6.0
         version: 0.6.0(typescript@5.9.3)
 
 packages:
