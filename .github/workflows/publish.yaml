@@ -33,13 +33,16 @@ jobs:
 
       - name: Configure npm for GitHub Packages
         run: |
+          CONFIG_PATH="${NPM_CONFIG_USERCONFIG:-$HOME/.npmrc}"
           {
             echo "@nivalis:registry=https://npm.pkg.github.com";
             echo "//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}";
-            echo "always-auth=true";
-          } >> "$HOME/.npmrc"
+            echo "//npm.pkg.github.com/:always-auth=true";
+          } >> "${CONFIG_PATH}"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Publish to GitHub Packages
         run: npm publish --registry=https://npm.pkg.github.com
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

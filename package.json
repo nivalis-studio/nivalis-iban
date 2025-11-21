@@ -35,6 +35,7 @@
 		"@commitlint/config-conventional": "20.0.0",
 		"@nivalis/biome-config": "2.3.7",
 		"@total-typescript/ts-reset": "0.6.1",
+		"@types/bun": "1.3.2",
 		"lefthook": "2.0.4",
 		"typescript": "5.9.3",
 		"zshy": "0.5.0"
