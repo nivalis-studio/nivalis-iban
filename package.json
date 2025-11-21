@@ -8,7 +8,7 @@
 	"type": "module",
 	"homepage": "https://github.com/nivalis-studio/iban#readme",
 	"repository": {
-		"url": "git+https://github.com/nivalis-studio/iban.git"
+		"url": "https://github.com/nivalis-studio/nivalis-iban"
 	},
 	"bugs": {
 		"url": "https://github.com/nivalis-studio/iban/issues"
