@@ -29,9 +29,17 @@ jobs:
         run: npm install -g npm@latest
 
       - name: Publish to npm
-        run: npm publish --registry=https://registry.npmjs.org
+        run: npm publish
 
-      - name: Publish to GitHub Packages
-        run: npm publish --registry=https://npm.pkg.github.com
+      - name: Configure npm for GitHub Packages
+        run: |
+          {
+            echo "@nivalis:registry=https://npm.pkg.github.com";
+            echo "//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}";
+            echo "always-auth=true";
+          } >> "$HOME/.npmrc"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish to GitHub Packages
+        run: npm publish
