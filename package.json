@@ -1,6 +1,6 @@
 {
 	"name": "@nivalis/iban",
-	"version": "0.3.3",
+	"version": "0.3.4",
 	"description": "A simple library to validate IBAN numbers",
 	"main": "./dist/index.cjs",
 	"module": "./dist/index.js",
